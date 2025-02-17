@@ -27,6 +27,13 @@ class LogService
      */
     public function __construct($logFile = 'app_log.txt')
     {
+        $logDir = __DIR__ . '/../../logs/';
+        if (!file_exists($logDir)) {
+            mkdir($logDir, 0777, true);
+        }
+
+        $logFile = $logDir . $logFile;
+
         $this->logFile = $logFile;
     }
 
@@ -45,6 +52,10 @@ class LogService
 
         $timestamp = date('Y-m-d H:i:s');
         $logMessage = "[$timestamp] [$level] $message\n";
+
+        if (!file_exists($this->logFile)) {
+            touch($this->logFile);
+        }
         
         // Append the log message to the log file
         file_put_contents($this->logFile, $logMessage, FILE_APPEND);

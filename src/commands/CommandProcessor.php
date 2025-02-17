@@ -79,16 +79,20 @@ class CommandProcessor
      */
     public function processCreateTable()
     {
-        $this->dbService->createTable();
+        $this->dbService->createUsersTable();
     }
 
-    public function processCSVFile($file)
+    public function processCSVFile($file, $dryRun = false)
     {
         $users = $this->csvProcessingService->processCsv($file);
         $this->logService->logInfo("The number of Users in the CSV file: " . count($users));
 
         foreach ($users as $user) {
-            $this->userService->createUser($user);
+            if ($dryRun) {
+                echo "Dry run - would insert: " . $user->getName() . " " . $user->getSurname() . " (" . $user->getEmail() . ")\n";
+            } else {
+                $this->userService->createUser($user);
+            }
         }
     }
 }

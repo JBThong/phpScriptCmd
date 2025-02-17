@@ -26,7 +26,7 @@ class DatabaseService
     /**
      * Create the users table in the database.
      */
-    public function createTable()
+    public function createUsersTable()
     {
         $sql = "CREATE TABLE IF NOT EXISTS users (
             id SERIAL PRIMARY KEY,

@@ -1,0 +1,26 @@
+# PHP-related
+/vendor/                  # Composer dependencies
+*.log                     # Log files
+*.bak                     # Backup files
+*.swp                     # Vim swap files
+
+# OS-specific
+.DS_Store                 # macOS file
+Thumbs.db                 # Windows file
+
+# Database-related
+*.sql                     # Database dump files
+
+# Configuration files
+/config/config.php        # Sensitive database credentials (should be configured locally)
+
+# PHPUnit
+phpunit.xml               # PHPUnit configuration file (can be configured per user)
+
+# IDE and editor files
+.idea/                    # JetBrains IDE files
+.vscode/                  # VS Code editor files
+*.iml                     # IntelliJ IDEA project files
+
+# Miscellaneous
+*.env                     # Environment variables file (contains sensitive information)

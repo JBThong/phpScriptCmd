@@ -3,6 +3,7 @@
 namespace App\Commands;
 
 use App\Services\Database\DatabaseService;
+use App\Services\Log\LogService;
 
 /**
  * Class CommandProcessor
@@ -84,11 +85,10 @@ class CommandProcessor
     public function processCSVFile($file)
     {
         $users = $this->csvProcessingService->processCsv($file);
-        var_dump($users);
+        $this->logService->logInfo("The number of Users in the CSV file: " . count($users));
 
         foreach ($users as $user) {
-            // create user.
-            // $this->userService->($user);
+            $this->userService->createUser($user);
         }
     }
 }

@@ -47,12 +47,18 @@ if ($pdo) {
 
 
 // Initialize services
-$logService = new LogService("/logs/log.txt");
+$logService = new LogService("log.txt");
 $dbService = new DatabaseService($logService, $pdo);
 
 $commandProcessor = new CommandProcessor($dbService);
 $csvProcessingService = new CSVProcessingService($logService);
 $commandProcessor->setCSVProcessingService($csvProcessingService);
+$commandProcessor->setLogService($logService);
+
+$userRepository = new UserRepository($pdo);
+$userService = new UserService($userRepository, $pdo);
+$userService->setLogService($logService);
+$commandProcessor->setUserService($userService);
 
 // Handle command options
 if (isset($options['create_table'])) {

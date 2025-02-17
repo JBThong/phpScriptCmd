@@ -42,11 +42,6 @@ class UserRepository {
         $stmt->bindValue(':surname', $userDTO->getSurname());
         $stmt->bindValue(':email', $userDTO->getEmail());
 
-        try {
-            $stmt->execute();
-            return true;
-        } catch (PDOException $e) {
-            return false;
-        }
+        return $stmt->execute();
     }
 }

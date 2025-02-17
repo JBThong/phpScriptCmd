@@ -91,4 +91,13 @@ class UserDTO {
     public function setEmail($email) {
         $this->email = strtolower($email);
     }
+
+    /**
+     * Validate the email address.
+     *
+     * @return bool True if the email is valid, false otherwise.
+     */
+    public function isValidEmail() {
+        return filter_var($this->email, FILTER_VALIDATE_EMAIL);
+    }
 }

@@ -4,6 +4,7 @@ namespace App\Services\Database;
 
 use PDO;
 use PDOException;
+use App\Services\Log\LogService;
 
 
 /**
@@ -15,8 +16,10 @@ class DatabaseService
 {
     private $pdo;
 
-    public function __construct(PDO $pdo)
-    {
+    private $logService;
+
+    public function __construct(LogService $logService, $pdo) {
+        $this->logService = $logService;
         $this->pdo = $pdo;
     }
 

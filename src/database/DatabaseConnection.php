@@ -3,6 +3,8 @@
 namespace App\Database;
 
 use PDO;
+use PDOException;
+use App\Services\Log\LogService;
 
 /**
  * Class Database
@@ -12,11 +14,17 @@ use PDO;
  * 
  * @package App\Database
  */
-class Database {
+class DatabaseConnection {
     /**
      * @var PDO $pdo The PDO instance used to interact with the database.
      */
     private $pdo;
+
+    /**
+     * @var LogService $logService The LogService instance for logging messages.
+     */
+    private $logService;
+
 
     /**
      * Database constructor.
@@ -38,7 +46,7 @@ class Database {
             $this->pdo = new PDO($dsn, $username, $password);
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (\PDOException $e) {
-            echo "Database connection error: " . $e->getMessage() . "\n";
+            $this->logService->logError("Database connection error: " . $e->getMessage());
             exit(1);
         }
     }
@@ -52,5 +60,14 @@ class Database {
      */
     public function getConnection() {
         return $this->pdo;
+    }
+
+    /**
+     * Set the LogService instance.
+     *
+     * @param LogService $logService
+     */
+    public function setLogService(LogService $logService) {
+        $this->logService = $logService;
     }
 }

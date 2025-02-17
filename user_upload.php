@@ -4,8 +4,13 @@ require_once __DIR__ . '/config/config.php';
 require_once __DIR__ . '/vendor/autoload.php';
 
 use App\Commands\CommandProcessor;
-use App\Database\Database;
+use App\Database\DatabaseConnection;
 use App\Services\Database\DatabaseService;
+
+use App\Services\CSVProcessor\CSVProcessingService;
+use App\Services\Log\LogService;
+use App\Services\User\UserService;
+use App\Repository\UserRepository;
 
 $options = getopt("", ["file:", "create_table", "dry_run", "help", "u:", "p:", "h:"]);
 
@@ -31,8 +36,7 @@ $dbUsername = $options['u'] ?? 'postgres';
 $dbPassword = $options['p'] ?? '';
 $dbName = DB_NAME;
 
-// Create a new Database object and establish a connection
-$db = new Database($dbHost, $dbUsername, $dbPassword, $dbName);
+$db = new DatabaseConnection($dbHost, $dbUsername, $dbPassword, $dbName);
 $pdo = $db->getConnection();
 if ($pdo) {
     echo "Connected to the PostgreSQL database successfully.\n";
@@ -41,12 +45,22 @@ if ($pdo) {
     exit(1);
 }
 
-// Create the DatabaseService and CommandProcessor objects
-$dbService = new DatabaseService($pdo);
+
+// Initialize services
+$logService = new LogService("/logs/log.txt");
+$dbService = new DatabaseService($logService, $pdo);
+
 $commandProcessor = new CommandProcessor($dbService);
+$csvProcessingService = new CSVProcessingService($logService);
+$commandProcessor->setCSVProcessingService($csvProcessingService);
 
 // Handle command options
 if (isset($options['create_table'])) {
-    // If 'create_table' is specified, create the users table
     $commandProcessor->processCreateTable();
+}
+
+if(isset($options['file'])) {
+    $csvFile = $options['file'];
+    $dryRun = isset($options['dry_run']);
+    $commandProcessor->processCSVFile($csvFile, $dryRun);
 }

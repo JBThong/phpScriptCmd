@@ -1,0 +1,10 @@
+{
+    "name": "php_command/1",
+    "description": "This project for command line in php language",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    }
+}

@@ -1,8 +1,11 @@
 <?php
 
-require_once __DIR__ . '/src/database/database.php';
 require_once __DIR__ . '/config/config.php';
-require_once __DIR__ . '/src/commands/process_command.php';
+require_once __DIR__ . '/vendor/autoload.php';
+
+use App\Commands\CommandProcessor;
+use App\Database\Database;
+use App\Services\Database\DatabaseService;
 
 $options = getopt("", ["file:", "create_table", "dry_run", "help", "u:", "p:", "h:"]);
 
@@ -38,4 +41,12 @@ if ($pdo) {
     exit(1);
 }
 
-$processCommand = new ProcessCommand($pdo);
+// Create the DatabaseService and CommandProcessor objects
+$dbService = new DatabaseService($pdo);
+$commandProcessor = new CommandProcessor($dbService);
+
+// Handle command options
+if (isset($options['create_table'])) {
+    // If 'create_table' is specified, create the users table
+    $commandProcessor->processCreateTable();
+}

@@ -57,4 +57,56 @@ class UserService {
 
         return $result;
     }
+
+    /**
+     * Create multiple users in a batch.
+     *
+     * @param array $users An array of UserDTO instances.
+     *
+     * @return bool True on successful creation, false otherwise.
+     */
+    public function createUsers(array $users)
+    {
+        $validUsers = [];
+        $invalidUsers = [];
+        $result = false;
+
+        // Validate the users
+        foreach ($users as $userDTO) {
+            if (!$userDTO->isValidEmail()) {
+                $this->logService->logError("Error inserting user: " . $userDTO->getName() . " - Invalid email address.");
+                $invalidUsers[] = $userDTO;
+            } else {
+                $validUsers[] = $userDTO;
+            }
+        }
+
+        // Insert valid users
+        if (count($validUsers) > 0) {
+            try {
+                $result = $this->userRepository->createUsers($validUsers);
+
+                if ($result) {
+                    foreach ($validUsers as $userDTO) {
+                        $this->logService->logInfo("User " . $userDTO->getName() . " added successfully.");
+                    }
+                } else {
+                    $this->logService->logError("Error inserting users batch.");
+                    $result = false;
+                }
+            } catch (PDOException $e) {
+                $this->logService->logError("Error inserting users batch - " . $e->getMessage());
+                $result = false;
+            }
+        }
+
+        if (count($invalidUsers) > 0) {
+            $this->logService->logInfo("The following users had invalid emails and were not inserted:");
+            foreach ($invalidUsers as $userDTO) {
+                $this->logService->logInfo("User " . $userDTO->getName() . " with email " . $userDTO->getEmail() . " was skipped.");
+            }
+        }
+
+        return $result;
+    }
 }

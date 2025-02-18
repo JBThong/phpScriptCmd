@@ -55,7 +55,7 @@ $csvProcessingService = new CSVProcessingService($logService);
 $commandProcessor->setCSVProcessingService($csvProcessingService);
 $commandProcessor->setLogService($logService);
 
-$userRepository = new UserRepository($pdo);
+$userRepository = new UserRepository($pdo, $logService);
 $userService = new UserService($userRepository, $pdo);
 $userService->setLogService($logService);
 $commandProcessor->setUserService($userService);

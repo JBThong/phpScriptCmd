@@ -82,17 +82,43 @@ class CommandProcessor
         $this->dbService->createUsersTable();
     }
 
-    public function processCSVFile($file, $dryRun = false)
+    /**
+     * Process the CSV file in batches to handle large files more efficiently.
+     *
+     * @param string $file The path to the CSV file.
+     * @param bool $dryRun If true, just simulate the process without inserting users.
+     * @param int $batchSize The number of users to process per batch.
+     */
+    public function processCSVFile($file, $dryRun = false, $batchSize = 1000)
     {
-        $users = $this->csvProcessingService->processCsv($file);
-        $this->logService->logInfo("The number of Users in the CSV file: " . count($users));
-
-        foreach ($users as $user) {
-            if ($dryRun) {
-                echo "Dry run - would insert: " . $user->getName() . " " . $user->getSurname() . " (" . $user->getEmail() . ")\n";
-            } else {
-                $this->userService->createUser($user);
-            }
+        if (!file_exists($file)) {
+            $this->logService->logError("Error: File does not exist: $file");
+            return;
         }
+
+        $usersProcessed = 0;
+
+        $batches = $this->csvProcessingService->processCsvInBatches($file, $batchSize);
+
+        foreach ($batches as $batch) {
+            if ($dryRun) {
+                foreach ($batch as $user) {
+                    echo "Dry run - would insert: " . $user->getName() . " " . $user->getSurname() . " (" . $user->getEmail() . ")\n";
+                }
+            } else {
+                try {
+                    $result = $this->userService->createUsers($batch);
+                    if ($result) {
+                        $this->logService->logInfo("Successfully created batch of " . count($batch) . " users.");
+                    }
+                } catch (\Exception $e) {
+                    $this->logService->logError("Error creating batch of users. Error: " . $e->getMessage());
+                }
+            }
+
+            $usersProcessed += count($batch);
+        }
+
+        $this->logService->logInfo("Total users processed: $usersProcessed");
     }
 }

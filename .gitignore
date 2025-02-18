@@ -24,3 +24,6 @@ phpunit.xml               # PHPUnit configuration file (can be configured per us
 
 # Miscellaneous
 *.env                     # Environment variables file (contains sensitive information)
+
+/vendor/
+/src/logs/*

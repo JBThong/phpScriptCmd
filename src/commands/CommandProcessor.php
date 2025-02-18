@@ -101,11 +101,18 @@ class CommandProcessor
         $batches = $this->csvProcessingService->processCsvInBatches($file, $batchSize);
 
         foreach ($batches as $batch) {
-            foreach ($batch as $user) {
-                if ($dryRun) {
+            if ($dryRun) {
+                foreach ($batch as $user) {
                     echo "Dry run - would insert: " . $user->getName() . " " . $user->getSurname() . " (" . $user->getEmail() . ")\n";
-                } else {
-                    $this->userService->createUser($user);
+                }
+            } else {
+                try {
+                    $result = $this->userService->createUsers($batch);
+                    if ($result) {
+                        $this->logService->logInfo("Successfully created batch of " . count($batch) . " users.");
+                    }
+                } catch (\Exception $e) {
+                    $this->logService->logError("Error creating batch of users. Error: " . $e->getMessage());
                 }
             }
 

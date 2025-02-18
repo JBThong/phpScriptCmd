@@ -26,7 +26,7 @@ This PHP script processes a CSV file containing user information and inserts it 
 4. Usage
 - Run the script with a CSV file (Dry Run):
    ```bash
-   php user_upload.php --file users.csv --dry_run --u username --p secret --h localhost
+   php user_upload.php --file users.csv --dry_run --u thongbui --p 123456 --h localhost
 - Create the users table in PostgreSQL:
    ```bash
    php user_upload.php --create_table --u username --p secret --h localhost
